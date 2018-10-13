@@ -1,0 +1,7 @@
+echo -e "int main(){printf(\"Hello World!\")}" >> gcc.tmp
+gcc gcc.tmp
+if [ echo $? != 0 ]
+   rm -rf gcc.tmp
+   exit 1
+fi
+rm -rf gcc.tmp a.out

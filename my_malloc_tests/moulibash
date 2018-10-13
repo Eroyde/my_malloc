@@ -1,0 +1,101 @@
+#!/bin/bash
+# MouliBash 4000 ! Make your own tests and see if your projects are bugged!
+# Made by Victor LE DANTEC
+
+ERRORSTOP=0 #1 makes the script stop at KO | 0 makes it continue even if KO
+
+exec 2> /dev/null #no stderr
+
+PUNCHLINES=()
+PUNCHLINES[0]="Now with memory detection technology!"
+PUNCHLINES[1]="Made with tek0's tears!"
+PUNCHLINES[2]="Definitely not approuved by Epitech."
+PUNCHLINES[3]="Powered by ponies."
+PUNCHLINES[4]="Reticulating splines!"
+PUNCHLINES[5]="Now in 8K UHD Super AMOLED HDR+!"
+PUNCHLINES[6]="git clone life.git"
+PUNCHLINES[7]="Fueled by dank memes."
+PUNCHLINES[8]="*bling bling* Oh hi Carli!"
+PUNCHLINES[9]="Truly testing tests and tested tests."
+PUNCHLINES[10]="Arch Linux Master Race!"
+PUNCHLINES[11]="mY CAPS loCK KEy is bROKEn"
+PUNCHLINES[12]="7300€ per year is 6 iPhone X or 1825 Happy Meals."
+PUNCHLINES[13]="Wanna hear a joke? IT MCA."
+PUNCHLINES[14]="https://youtu.be/t6q5_7fVjEg"
+PUNCHLINES[15]="Glitch-free, gluten-free and test-free."
+PUNCHLINES[16]="Now featuring a headphone jack. Suck that Apple!"
+PUNCHLINES[17]="\"iPhone X is the future\". Without USB-C. Fucking genius."
+PUNCHLINES[18]="Segmentation fault (core dumped)\nSorry did I scare you?"
+PUNCHLINES[19]="7300€ per year, and we can't get chairs."
+PUNCHLINES[20]="Definitely not crashing every two days."
+
+## Fancy logo
+echo -e "######################################"
+echo -e "# MouliBash 4000 - My_Malloc Edition #"
+echo -e "#         by Victor Le Dantec        #"
+echo -e "######################################"
+
+RAND=$((RANDOM%20))
+echo -e ${PUNCHLINES[RAND]}
+echo
+
+## Check if lib malloc is here
+(ls | grep "libmy_malloc.so" > /dev/null)
+RESULT2=$( echo "$?" )
+if [ $RESULT2 != "0" ]
+then
+    echo "Didn't find libmy_malloc.so :("
+    exit 1
+fi
+
+
+for TEST in tests/*.test
+do
+    echo "$TEST :"
+    echo -e -n "\t\t\t"
+    timeout 10s bash -c "LD_PRELOAD=$(pwd)/libmy_malloc.so ./$TEST &> /dev/null"
+    RESULT=$( echo "$?" )
+    if [ $RESULT != "0" ]
+    then
+	if [ $RESULT == "124" ]
+	then
+	    echo "TIMEOUT 10s"
+	elif [ $RESULT == "139" ]
+	then
+	    echo "SEGV!"
+	else
+            echo "KO!"
+	fi
+        if [ $ERRORSTOP != "0" ]
+        then
+            break
+        fi
+    else
+        echo "OK!"
+    fi
+done
+
+## Speed test!!
+echo -e "###############"
+echo -e "# Speed test! #"
+echo -e "###############"
+echo -e -n "My_Malloc :\n"
+timeout 60s bash -c "LD_PRELOAD=$(pwd)/libmy_malloc.so ./tests/speed_test"
+RESULT=$( echo "$?" )
+if [ $RESULT == "124" ]
+then
+    echo -e "\t\t\tTIMEOUT 60s"
+elif [ $RESULT == "139" ]
+then
+    echo -e "\t\t\tSEGV :("
+fi
+echo -e -n "System Malloc:\n"
+timeout 20s bash -c "./tests/speed_test"
+
+exit 0
+
+## Machine specs
+echo -e "#################"
+echo -e "# Machine specs #"
+echo -e "#################\n"
+screenfetch | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g"
